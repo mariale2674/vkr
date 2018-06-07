@@ -8,20 +8,15 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from matplotlib import style
-
 import tkinter as tk
 from PIL import ImageTk, Image
-
-import load_balance as lb
-
-# import random
-
-# import pandas as pd
 import numpy as np
+import load_balance as lb
 
 LARGE_FONT = ("Verdana, 12")
 NORMAL_FONT = ("TimesNewRoman, 10")
 SMALL_FONT = ("TimesNewRoman, 8")
+
 style.use("ggplot")
 
 N = 5
@@ -100,10 +95,6 @@ class LoadBalance(tk.Tk):
         editmenu.add_command(label="Вставить")
         editmenu.add_command(label="Удалить")
         editmenu.add_command(label="Выбрать все")
-
-        # exchangeChoice = tk.Menu(menu, tearoff=1)
-        # exchangeChoice.add_command(label="3 сервера",
-        #                            command = lambda: changeExchange())
 
         helpmenu = tk.Menu(menu, tearoff=0)
         helpmenu.add_command(label='Помощь',
@@ -189,11 +180,7 @@ class ThreeServerWindow(tk.Frame):
 def main():
     app = LoadBalance()
     app.geometry("1000x500")
-    # load_balance() # Запускаем функцию балансировки
-    # Создать алгоритм балансировки и подсчитать оптимальный интервал считывания.
-    # Записывать все данные в файл.
-    # Раз в этот интервал запускать функцию ani и считывать данные из файла.
-    ani = animation.FuncAnimation(fig, animate, interval=1000)
+    ani = animation.FuncAnimation(fig, animate, interval=10)
     app.mainloop()
 
 
