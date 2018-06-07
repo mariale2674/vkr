@@ -3,6 +3,8 @@
 
 import random
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 np.set_printoptions(threshold=np.nan)
 
 N = 5
@@ -48,6 +50,8 @@ class LoadBalance:
         past_b = 0
         past_u = np.array([0] * N)
         forecast = np.array([0] * N)
+
+        # fig, ax = plt.subplots()
 
         while k < 10:
             g = 0
