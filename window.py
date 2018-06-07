@@ -13,7 +13,6 @@ import tkinter as tk
 from PIL import ImageTk, Image
 
 import load_balance as lb
-# import monitoring as m
 
 # import random
 
@@ -21,7 +20,8 @@ import load_balance as lb
 import numpy as np
 
 LARGE_FONT = ("Verdana, 12")
-# Будет время, можно поиграться со стилями
+NORMAL_FONT = ("TimesNewRoman, 10")
+SMALL_FONT = ("TimesNewRoman, 8")
 style.use("ggplot")
 
 N = 5
@@ -30,22 +30,22 @@ M = 5
 fig = Figure()
 a = fig.add_subplot(111)
 
-# Всплывающие сообщения не работают, разобраться
-# def popupmsg(msg):
-#     popup = tk.Tk()
-#
-#     def leavemini():
-#         popup.destroy()
-#
-#     popup.wm_title('!')
-#
-#     label = tk.Label(popup, text=msg)
-#     label.pack(side="TOP", fill="X", pady=10)
-#
-#     b1 = tk.Button(popup, text="Ok", command = leavemini)
-#     b1.pack()
-#
-#     popup.mainloop()
+# Всплывающие сообщения
+def popupmsg(msg):
+    popup = tk.Tk()
+
+    def leavemini():
+        popup.destroy()
+
+    popup.wm_title('!')
+
+    label = tk.Label(popup, text=msg)
+    label.pack()
+
+    b1 = tk.Button(popup, text="Ok", width=10, command = leavemini)
+    b1.pack()
+
+    popup.mainloop()
 
 
 def animate(i):
@@ -70,8 +70,8 @@ def animate(i):
         a.set_title(title)
     except IOError:
         print("An IOError has occurred!")
-    finally:
-        pullData.close()  # Узнать, почему не работает и надо ли вообще
+    # finally:
+    #     pullData.close()  # Узнать, почему не работает и надо ли вообще
 
 
 class LoadBalance(tk.Tk):
@@ -85,15 +85,40 @@ class LoadBalance(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        # Сделать меню
-        # menubar = tk.Menu(container)
-        # filemanu = tk.Menu(menubar, tearoff=0)
-        # filemanu.add_command(label='Save settings',command = lambda: popupmsg('В разработке :С'))
-        # filemanu.add_separator()
-        # filemanu.add_command(label='Exit', command=quit())
-        # menubar.add_cascade(label='File', menu=filemanu)
-        #
-        # tk.Tk.config(self, menu=menubar)
+        # Меню
+        menu = tk.Menu(container)
+        filemenu = tk.Menu(menu, tearoff=0)
+        filemenu.add_command(label="Новый")
+        filemenu.add_command(label="Открыть")
+        filemenu.add_command(label="Сохранить")
+        filemenu.add_command(label="Сохранить как...")
+        filemenu.add_command(label="Выход", command=lambda: container.quit())
+
+        editmenu = tk.Menu(menu, tearoff=0)
+        editmenu.add_command(label="Вырезать")
+        editmenu.add_command(label="Копировать")
+        editmenu.add_command(label="Вставить")
+        editmenu.add_command(label="Удалить")
+        editmenu.add_command(label="Выбрать все")
+
+        # exchangeChoice = tk.Menu(menu, tearoff=1)
+        # exchangeChoice.add_command(label="3 сервера",
+        #                            command = lambda: changeExchange())
+
+        helpmenu = tk.Menu(menu, tearoff=0)
+        helpmenu.add_command(label='Помощь',
+                             command = lambda: popupmsg('Никто Вам не поможет.\n'
+                                                                       'Запуск программы осуществляется под Вашу ответственность.\n'
+                                                                       'Студентка группы ИКПИ-42 Лебедева Мария\n'
+                                                                       'Не несет ответственности за любые неполадки.\n'
+                                                                       'Спасибо за внимание.'))
+        helpmenu.add_command(label="О программе")
+
+        menu.add_cascade(label="Файл", menu=filemenu)
+        menu.add_cascade(label="Действия", menu=editmenu)
+        menu.add_cascade(label="Справка", menu=helpmenu)
+
+        tk.Tk.config(self, menu=menu)
 
         self.frames = {}
 
@@ -152,7 +177,7 @@ class ThreeServerWindow(tk.Frame):
         self.button1.grid(row=3, column=0, pady=7)
 
         canvas = FigureCanvasTkAgg(fig, self)
-        canvas.show()
+        canvas.draw()
         canvas.get_tk_widget().grid(row=1, column=1, rowspan=3)
 
         # Панель навигации больше не работает, исправить, если будет время
@@ -173,7 +198,7 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
+    main()
     # N = 5
     # M = 5
     u = np.array([0] * N)
