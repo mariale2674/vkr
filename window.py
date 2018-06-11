@@ -12,6 +12,7 @@ import tkinter as tk
 from PIL import ImageTk, Image
 import numpy as np
 import load_balance as lb
+import random
 
 LARGE_FONT = ("Verdana, 12")
 NORMAL_FONT = ("TimesNewRoman, 10")
@@ -19,13 +20,13 @@ SMALL_FONT = ("TimesNewRoman, 8")
 
 style.use("ggplot")
 
-N = 5
+# N = 3
 M = 5
 
 fig = Figure()
 a = fig.add_subplot(111)
 
-# Всплывающие сообщения
+
 def popupmsg(msg):
     popup = tk.Tk()
 
@@ -41,7 +42,6 @@ def popupmsg(msg):
     b1.pack()
 
     popup.mainloop()
-
 
 def animate(i):
     try:
@@ -65,8 +65,6 @@ def animate(i):
         a.set_title(title)
     except IOError:
         print("An IOError has occurred!")
-    # finally:
-    #     pullData.close()  # Узнать, почему не работает и надо ли вообще
 
 
 class LoadBalance(tk.Tk):
@@ -80,7 +78,6 @@ class LoadBalance(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        # Меню
         menu = tk.Menu(container)
         filemenu = tk.Menu(menu, tearoff=0)
         filemenu.add_command(label="Новый")
@@ -98,11 +95,7 @@ class LoadBalance(tk.Tk):
 
         helpmenu = tk.Menu(menu, tearoff=0)
         helpmenu.add_command(label='Помощь',
-                             command = lambda: popupmsg('Никто Вам не поможет.\n'
-                                                                       'Запуск программы осуществляется под Вашу ответственность.\n'
-                                                                       'Студентка группы ИКПИ-42 Лебедева Мария\n'
-                                                                       'Не несет ответственности за любые неполадки.\n'
-                                                                       'Спасибо за внимание.'))
+                             command = lambda: popupmsg('Никто вам не поможет.\n'))
         helpmenu.add_command(label="О программе")
 
         menu.add_cascade(label="Файл", menu=filemenu)
@@ -113,7 +106,7 @@ class LoadBalance(tk.Tk):
 
         self.frames = {}
 
-        for F in (StartPage, ThreeServerWindow):
+        for F in (StartPage, ThreeServerWindow, FourServerWindow, FiveServerWindow):
             frame = F(container, self)
 
             self.frames[F] = frame
@@ -122,8 +115,8 @@ class LoadBalance(tk.Tk):
 
         self.show_frame(StartPage)
 
-    def show_frame(self, cont):
-        frame = self.frames[cont]
+    def show_frame(self, count):
+        frame = self.frames[count]
         frame.tkraise()
 
 
@@ -132,49 +125,109 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         self.label = tk.Label(self, text='Выберите количество серверов:', width=50, height=5, font=LARGE_FONT)
-        self.label.grid(row=0)
+        self.label.grid(row=0, column=0)
+
+        # self.entry = tk.Entry(self)
+        # self.N = int(self.entry.get())
+        # self.entry.grid(row=1, column=0)
 
         self.button1 = tk.Button(self, text='3 сервера',
                                   command=lambda: controller.show_frame(ThreeServerWindow))
-        self.button1.grid(row=0, column=1)
+        self.button1.grid(row=2, column=0)
 
         self.button2 = tk.Button(self, text='4 сервера',
-                                 command=lambda: controller.show_frame(ThreeServerWindow))
-        self.button2.grid(row=0, column=2)
+                                 command=lambda: controller.show_frame(FourServerWindow))
+        self.button2.grid(row=2, column=1)
 
         self.button3 = tk.Button(self, text='5 серверов',
-                                 command=lambda: controller.show_frame(ThreeServerWindow))
-        self.button3.grid(row=0, column=3)
+                                 command=lambda: controller.show_frame(FiveServerWindow))
+        self.button3.grid(row=2, column=2)
 
 
 class ThreeServerWindow(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text='Загруженность сети', font=LARGE_FONT)
-        self.label.grid(row=0, column=0, columnspan=2)
+        self.label.grid(row=0, column=0, columnspan=3)
 
         self.img = ImageTk.PhotoImage(Image.open("img/N3.jpg"))
         self.topology = tk.Label(self, image=self.img)
-        self.topology.grid(row=1, column=0)
+        self.topology.grid(row=1, column=0, columnspan=2)
 
-        self.info = tk.Label(self, text='Какая-нибудь информация', width=50, height=5)
-        self.info.grid(row=2, column=0)
+        self.info = tk.Label(self, text='Информация:\n', width=50, height=5)
+        self.info.grid(row=2, column=0, columnspan=2)
 
-        # self.graph = tk.Label(self, text=g.show())
-        # self.graph.pack()
-
-        self.button1 = tk.Button(self, text='Назад',
-                                 command=lambda: controller.show_frame(StartPage))
+        self.button1 = tk.Button(self, text='Старт',
+                                 command=lambda: ThreeServerWindow.start(self))
         self.button1.grid(row=3, column=0, pady=7)
+        self.button2 = tk.Button(self, text='Назад',
+                                 command=lambda: controller.show_frame(StartPage))
+        self.button2.grid(row=3, column=1, pady=7)
 
         canvas = FigureCanvasTkAgg(fig, self)
         canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=1, rowspan=3)
+        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
 
-        # Панель навигации больше не работает, исправить, если будет время
-        # toolbar = NavigationToolbar2TkAgg(canvas, self)
-        # toolbar.update()
-        # canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    def start(self):
+        self.N = 3
+        self.u = np.array([0] * self.N)
+        self.u_max = np.array([3000, 4000, 5000])
+        self.time = np.array([100, 200, 300])
+        self.X = np.array([[1, 0, 1, 0, 1],
+                           [0, 1, 1, 0, 1],
+                           [1, 0, 1, 1, 0]])
+
+        LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
+        LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
+
+
+class FourServerWindow(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.label = tk.Label(self, text='Загруженность сети', font=LARGE_FONT)
+        self.label.grid(row=0, column=0, columnspan=2)
+
+        self.button1 = tk.Button(self, text='Назад',
+                                 command=lambda: controller.show_frame(StartPage))
+        self.button1.grid()
+
+    def start(self):
+        self.N = 4
+        self.u = np.array([0] * self.N)
+        self.u_max = np.array([3000, 4000, 5000, 4000])
+        self.time = np.array([100, 150, 200, 300])
+        self.X = np.array([[1, 0, 0, 0, 1],
+                           [0, 1, 0, 0, 0],
+                           [0, 0, 1, 0, 0],
+                           [0, 0, 0, 1, 0]])
+
+        LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
+        LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
+
+
+class FiveServerWindow(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.label = tk.Label(self, text='Загруженность сети', font=LARGE_FONT)
+        self.label.grid(row=0, column=0, columnspan=2)
+
+        self.button1 = tk.Button(self, text='Назад',
+                                 command=lambda: controller.show_frame(StartPage))
+        self.button1.grid()
+
+    def start(self):
+        self.N = 5
+        self.u = np.array([0] * self.N)
+        self.u_max = np.array([1000, 2000, 3000, 4000, 5000])
+        self.time = np.array([300, 200, 200, 300, 400])
+        self.X = np.array([[1, 0, 0, 0, 0],
+                           [0, 1, 0, 0, 0],
+                           [0, 0, 1, 0, 0],
+                           [0, 1, 1, 1, 0],
+                           [1, 1, 0, 1, 1]])
+
+        LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
+        LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
 
 
 def main():
@@ -186,38 +239,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # N = 5
-    # M = 5
-    u = np.array([0] * N)
-    u_max = np.array([0] * N)
-    time = np.array([0] * N)
-    X = np.array([N, M])
-
-    if N == 3:
-
-        time = np.array([100, 200, 300])
-        X = np.array([[1, 0, 0, 0, 0],
-                      [0, 1, 0, 0, 1],
-                      [1, 0, 1, 1, 0]])
-    else:
-        if N == 4:
-
-            time = np.array([100, 150, 200, 300])
-            X = np.array([[1, 0, 0, 0, 1],
-                 [0, 1, 0, 0, 0],
-                 [0, 0, 1, 0, 0],
-                 [0, 0, 0, 1, 0]])
-        else:
-            if N == 5:
-                u_max = np.array([1000, 2000, 3000, 4000, 5000])
-                time = np.array([300, 200, 200, 300, 400])
-                X = np.array([[1, 0, 0, 0, 0],
-                              [0, 1, 0, 0, 0],
-                              [0, 0, 1, 0, 0],
-                              [0, 1, 1, 1, 0],
-                              [1, 1, 0, 1, 1]])
-            else:
-                print('Некорректное число серверов.')
-
-    LB = lb.LoadBalance(u, u_max, X, time)
-    LB.distribution(LB.u, LB.u_max, LB.X, LB.time)
