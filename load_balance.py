@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 np.set_printoptions(threshold=np.nan)
+import codecs
 
 import window as w
 
@@ -132,7 +133,20 @@ class LoadBalance:
             past_u = u
             k += 1
 
-        print('Загруженность серверов', u)
-        print('Прогнозируемая загруженность', forecast)
-        print('Очередь', q)
-        print('Потерянные запросы', lost)
+        try:
+            file = codecs.open("buf.txt", "w", "utf-8")
+
+            for element in u:
+                file.write("%s " % element)
+
+            file.write("\n")
+
+            for element in forecast:
+                file.write("%s " % element)
+
+            file.write("\n%s" % q)
+            file.write("\n%s" % lost)
+
+            file.close()
+        except IOError:
+            print("An IOError has occurred!")
