@@ -128,6 +128,40 @@ class LoadBalance:
             b = LoadBalance.flaw(self, g, n, present_lam, past_lam)
             d = LoadBalance.dist(self, d, b, past_b)
 
+            try:
+                file = codecs.open("N1.txt", "a", "utf-8")
+                file.write("%s" % k)
+                file.write(",%s" % u[0])
+                file.write("\n")
+                file.close()
+                file = codecs.open("N2.txt", "a", "utf-8")
+                file.write("%s" % k)
+                file.write(",%s" % u[1])
+                file.write("\n")
+                file.close()
+                file = codecs.open("N3.txt", "a", "utf-8")
+                file.write("%s" % k)
+                file.write(",%s" % u[2])
+                file.write("\n")
+                file.close()
+
+                if N == 4:
+                    file = codecs.open("N4.txt", "a", "utf-8")
+                    file.write(" %s" % k)
+                    file.write(",%s" % u[3])
+                    file.write("\n")
+                    file.close()
+
+                if N == 5:
+                    file = codecs.open("N5.txt", "a", "utf-8")
+                    file.write(" %s" % k)
+                    file.write(",%s" % u[4])
+                    file.write("\n")
+                    file.close()
+
+            except IOError:
+                print("An IOError has occurred!")
+
             past_b = b
             past_request = requests
             past_u = u
