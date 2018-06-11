@@ -3,12 +3,8 @@
 
 import random
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 np.set_printoptions(threshold=np.nan)
 import codecs
-
-import window as w
 
 M = 5
 
@@ -58,7 +54,6 @@ class LoadBalance:
             Arr = np.array([0] * n)
             requests = random.randint(100, 1000)
 
-            # Распределение запросов (с учетом типа)
             for i in range(requests):
                 array_of_types = random.randint(0, 4)
                 buf = [row[array_of_types] for row in X]
@@ -79,13 +74,11 @@ class LoadBalance:
                 else:
                     u[min_N] += 1
 
-            # Обработка запросов
             for i in range(N):
                 u[i] -= random.randint(0, time[i])
                 if u[i] < 0:
                     u[i] = 0
 
-            # Обработка очереди
             if q > 1:
                 for request in q_types:
                     type = q_types[request]
@@ -103,10 +96,8 @@ class LoadBalance:
                         q -= 1
                         q_types.remove(type)
 
-            # Подсчет прогнозируемой величины
             forecast = u + past_u
 
-            # Сбор статистики
             present_lam = LoadBalance.lam(self, requests, d)
             if k == 1:
                 past_lam = LoadBalance.lam(self, random.randint(100, 1000), d)
