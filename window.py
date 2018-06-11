@@ -179,8 +179,7 @@ class ThreeServerWindow(tk.Frame):
         LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
         LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
 
-        # ThreeServerWindow.build_graph(self, self.canvas)
-        ThreeServerWindow.test_graph(self, self.fig,
+        ThreeServerWindow.build_graph(self, self.fig,
                                      self.ax1, self.ax2, self.ax3,
                                      self.canvas)
 
@@ -213,15 +212,19 @@ class ThreeServerWindow(tk.Frame):
         canvas.draw()
         canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
 
-    def build_graph(self, canvas):
+    def build_graph(self, fig, ax1, ax2, ax3, canvas):
         try:
-            fig = Figure()
+            file1 = open("N2.txt", "r").read()
+            ax1_list = file1.split('\n')
+            xList = []
+            yList = []
 
-            xList = [1,2,3,4,5,6,7,8,9,10]
-            yList = [5,2,7,7,8,0,6,4,3,3]
+            for eachLine in ax1_list:
+                if len(eachLine) > 1:
+                    x, y = eachLine.split(',')
+                    xList.append(int(x))
+                    yList.append(int(y))
 
-            # ax1.clear()
-            ax1 = fig.add_subplot(311)
             ax1.plot(xList, yList, "black", label='CPU')
             ax1.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
 
@@ -239,8 +242,6 @@ class ThreeServerWindow(tk.Frame):
                     xList.append(int(x))
                     yList.append(int(y))
 
-            # ax2.clear()
-            ax2 = fig.add_subplot(312)
             ax2.plot(xList, yList, "black", label='CPU')
             ax2.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
 
@@ -258,10 +259,9 @@ class ThreeServerWindow(tk.Frame):
                     xList.append(int(x))
                     yList.append(int(y))
 
-            # ax3.clear()
-            ax3 = fig.add_subplot(313)
             ax3.plot(xList, yList, "black", label='CPU')
             ax3.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
+
             title = "Сервер N3"
             ax3.set_title(title)
 
