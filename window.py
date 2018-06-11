@@ -22,6 +22,10 @@ style.use("ggplot")
 
 # N = 3
 M = 5
+var_u = '0'
+var_forecast = '0'
+var_queue = '0'
+var_lost = '0'
 
 fig = Figure()
 a = fig.add_subplot(111)
@@ -78,6 +82,9 @@ class LoadBalance(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
+        # scrollbar = tk.Scrollbar(self)
+        # scrollbar.pack(side = tk.RIGHT, fill = Y)
+
         menu = tk.Menu(container)
         filemenu = tk.Menu(menu, tearoff=0)
         filemenu.add_command(label="Новый")
@@ -125,7 +132,7 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         self.label = tk.Label(self, text='Выберите количество серверов:', width=50, height=5, font=LARGE_FONT)
-        self.label.grid(row=0, column=0)
+        self.label.grid(row=0, column=0, columnspan=3)
 
         # self.entry = tk.Entry(self)
         # self.N = int(self.entry.get())
@@ -148,14 +155,39 @@ class ThreeServerWindow(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text='Загруженность сети', font=LARGE_FONT)
-        self.label.grid(row=0, column=0, columnspan=3)
+        self.label.grid(sticky=tk.N, column=0, columnspan=3, pady=7)
 
         self.img = ImageTk.PhotoImage(Image.open("img/N3.jpg"))
         self.topology = tk.Label(self, image=self.img)
-        self.topology.grid(row=1, column=0, columnspan=2)
+        self.topology.grid(row=1, column=0, columnspan=2, padx=7)
 
-        self.info = tk.Label(self, text='Информация:\n', width=50, height=5)
-        self.info.grid(row=2, column=0, columnspan=2)
+        self.info = tk.Frame(self)
+        self.info.grid(row=2, column=0)
+        self.info_text1 = tk.Label(self.info, text='Загруженность:',
+                                  font=NORMAL_FONT)
+        self.info_text2 = tk.Label(self.info, text='Прогноз:',
+                                  font=NORMAL_FONT)
+        self.info_text3 = tk.Label(self.info, text='Очередь:',
+                                  font=NORMAL_FONT)
+        self.info_text4 = tk.Label(self.info, text='Потерянные запросы:',
+                                  font=NORMAL_FONT)
+        self.info_text1.grid(row=0, sticky=tk.W, padx=7)
+        self.info_text2.grid(row=1, sticky=tk.W, padx=7)
+        self.info_text3.grid(row=2, sticky=tk.W, padx=7)
+        self.info_text4.grid(row=3, sticky=tk.W, padx=7)
+
+        self.data_u = tk.Label(self.info, text=var_u,
+                               font=SMALL_FONT)
+        self.data_forecast = tk.Label(self.info, text=var_forecast,
+                               font=SMALL_FONT)
+        self.data_queue = tk.Label(self.info, text=var_queue,
+                               font=SMALL_FONT)
+        self.data_lost = tk.Label(self.info, text=var_lost,
+                               font=SMALL_FONT)
+        self.data_u.grid(row=0, column=2, sticky=tk.W, padx=7)
+        self.data_forecast.grid(row=1, column=2, sticky=tk.W, padx=7)
+        self.data_queue.grid(row=2, column=2, sticky=tk.W, padx=7)
+        self.data_lost.grid(row=3, column=2, sticky=tk.W, padx=7)
 
         self.button1 = tk.Button(self, text='Старт',
                                  command=lambda: ThreeServerWindow.start(self))
@@ -180,6 +212,27 @@ class ThreeServerWindow(tk.Frame):
         LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
         LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
 
+        try:
+            pullData = open("buf.txt", "r").read()
+            dataList = pullData.split('\n')
+
+            self.data_u = tk.Label(self.info, text=dataList[0],
+                                   font=SMALL_FONT)
+            self.data_forecast = tk.Label(self.info, text=dataList[1],
+                                          font=SMALL_FONT)
+            self.data_queue = tk.Label(self.info, text=dataList[2],
+                                       font=SMALL_FONT)
+            self.data_lost = tk.Label(self.info, text=dataList[3],
+                                      font=SMALL_FONT)
+            self.data_u.grid(row=0, column=2, sticky=tk.W, padx=7)
+            self.data_forecast.grid(row=1, column=2, sticky=tk.W, padx=7)
+            self.data_queue.grid(row=2, column=2, sticky=tk.W, padx=7)
+            self.data_lost.grid(row=3, column=2, sticky=tk.W, padx=7)
+
+            # pullData.close()
+        except IOError:
+            print("An IOError has occurred!")
+            
 
 class FourServerWindow(tk.Frame):
     def __init__(self, parent, controller):
@@ -234,14 +287,14 @@ class FiveServerWindow(tk.Frame):
 
         self.button1 = tk.Button(self, text='Старт',
                                  command=lambda: FiveServerWindow.start(self))
-        self.button1.grid(row=3, column=0, pady=7)
+        self.button1.grid(row=4, column=0, pady=7)
         self.button2 = tk.Button(self, text='Назад',
                                  command=lambda: controller.show_frame(StartPage))
-        self.button2.grid(row=3, column=1, pady=7)
+        self.button2.grid(row=4, column=1, pady=7)
 
         canvas = FigureCanvasTkAgg(fig, self)
         canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+        canvas.get_tk_widget().grid(row=1, column=2, rowspan=4)
 
     def start(self):
         self.N = 5
@@ -256,6 +309,8 @@ class FiveServerWindow(tk.Frame):
 
         LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
         LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
+
+        # print()
 
 
 def main():
