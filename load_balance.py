@@ -7,19 +7,19 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 np.set_printoptions(threshold=np.nan)
 
-N = 5
+import window as w
+
 M = 5
 
 
 class LoadBalance:
-    def __init__(self, u, u_max, X, time):
-        # self.N = N
+    def __init__(self, u, u_max, X, time, N):
+        self.N = N
         self.u = u
         self.u_max = u_max
         self.X = X
         self.time = time
 
-        global N
         global M
 
     def lam(self, k, d):
@@ -38,7 +38,7 @@ class LoadBalance:
     def dist(self, d, b, past_b):
         return past_b * d / b
 
-    def distribution(self, u, u_max, X, time):
+    def distribution(self, u, u_max, X, time, N):
         k = 1
         d = 300
         n = 3
@@ -51,9 +51,7 @@ class LoadBalance:
         past_u = np.array([0] * N)
         forecast = np.array([0] * N)
 
-        # fig, ax = plt.subplots()
-
-        while k < 10:
+        while k < 100:
             g = 0
             arr = 0
             Arr = np.array([0] * n)
