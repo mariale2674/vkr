@@ -185,11 +185,25 @@ class FourServerWindow(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text='Загруженность сети', font=LARGE_FONT)
-        self.label.grid(row=0, column=0, columnspan=2)
+        self.label.grid(row=0, column=0, columnspan=3)
 
-        self.button1 = tk.Button(self, text='Назад',
+        self.img = ImageTk.PhotoImage(Image.open("img/N3.jpg"))
+        self.topology = tk.Label(self, image=self.img)
+        self.topology.grid(row=1, column=0, columnspan=2)
+
+        self.info = tk.Label(self, text='Информация:\n', width=50, height=5)
+        self.info.grid(row=2, column=0, columnspan=2)
+
+        self.button1 = tk.Button(self, text='Старт',
+                                 command=lambda: FourServerWindow.start(self))
+        self.button1.grid(row=3, column=0, pady=7)
+        self.button2 = tk.Button(self, text='Назад',
                                  command=lambda: controller.show_frame(StartPage))
-        self.button1.grid()
+        self.button2.grid(row=3, column=1, pady=7)
+
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
 
     def start(self):
         self.N = 4
@@ -209,11 +223,25 @@ class FiveServerWindow(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.label = tk.Label(self, text='Загруженность сети', font=LARGE_FONT)
-        self.label.grid(row=0, column=0, columnspan=2)
+        self.label.grid(row=0, column=0, columnspan=3)
 
-        self.button1 = tk.Button(self, text='Назад',
+        self.img = ImageTk.PhotoImage(Image.open("img/N3.jpg"))
+        self.topology = tk.Label(self, image=self.img)
+        self.topology.grid(row=1, column=0, columnspan=2)
+
+        self.info = tk.Label(self, text='Информация:\n', width=50, height=5)
+        self.info.grid(row=2, column=0, columnspan=2)
+
+        self.button1 = tk.Button(self, text='Старт',
+                                 command=lambda: FiveServerWindow.start(self))
+        self.button1.grid(row=3, column=0, pady=7)
+        self.button2 = tk.Button(self, text='Назад',
                                  command=lambda: controller.show_frame(StartPage))
-        self.button1.grid()
+        self.button2.grid(row=3, column=1, pady=7)
+
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
 
     def start(self):
         self.N = 5
