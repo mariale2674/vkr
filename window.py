@@ -12,6 +12,7 @@ import tkinter as tk
 from PIL import ImageTk, Image
 import numpy as np
 import load_balance as lb
+import codecs
 import random
 
 LARGE_FONT = ("Verdana, 12")
@@ -20,15 +21,11 @@ SMALL_FONT = ("TimesNewRoman, 8")
 
 style.use("ggplot")
 
-# N = 3
 M = 5
 var_u = '0'
 var_forecast = '0'
 var_queue = '0'
 var_lost = '0'
-
-fig = Figure()
-a = fig.add_subplot(111)
 
 
 def popupmsg(msg):
@@ -47,29 +44,6 @@ def popupmsg(msg):
 
     popup.mainloop()
 
-def animate(i):
-    try:
-        pullData = open("data.txt", "r").read()
-        dataList = pullData.split('\n')
-        xList = []
-        yList = []
-
-        for eachLine in dataList:
-            if len(eachLine) > 1:
-                x, y = eachLine.split(',')
-                xList.append(int(x))
-                yList.append(int(y))
-
-        a.clear()
-
-        a.plot(xList, yList, "black", label='CPU')
-        a.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
-
-        title = "Сервер N1"
-        a.set_title(title)
-    except IOError:
-        print("An IOError has occurred!")
-
 
 class LoadBalance(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -87,18 +61,7 @@ class LoadBalance(tk.Tk):
 
         menu = tk.Menu(container)
         filemenu = tk.Menu(menu, tearoff=0)
-        filemenu.add_command(label="Новый")
-        filemenu.add_command(label="Открыть")
-        filemenu.add_command(label="Сохранить")
-        filemenu.add_command(label="Сохранить как...")
         filemenu.add_command(label="Выход", command=lambda: container.quit())
-
-        editmenu = tk.Menu(menu, tearoff=0)
-        editmenu.add_command(label="Вырезать")
-        editmenu.add_command(label="Копировать")
-        editmenu.add_command(label="Вставить")
-        editmenu.add_command(label="Удалить")
-        editmenu.add_command(label="Выбрать все")
 
         helpmenu = tk.Menu(menu, tearoff=0)
         helpmenu.add_command(label='Помощь',
@@ -106,7 +69,6 @@ class LoadBalance(tk.Tk):
         helpmenu.add_command(label="О программе")
 
         menu.add_cascade(label="Файл", menu=filemenu)
-        menu.add_cascade(label="Действия", menu=editmenu)
         menu.add_cascade(label="Справка", menu=helpmenu)
 
         tk.Tk.config(self, menu=menu)
@@ -134,10 +96,6 @@ class StartPage(tk.Frame):
         self.label = tk.Label(self, text='Выберите количество серверов:', width=50, height=5, font=LARGE_FONT)
         self.label.grid(row=0, column=0, columnspan=3)
 
-        # self.entry = tk.Entry(self)
-        # self.N = int(self.entry.get())
-        # self.entry.grid(row=1, column=0)
-
         self.button1 = tk.Button(self, text='3 сервера',
                                   command=lambda: controller.show_frame(ThreeServerWindow))
         self.button1.grid(row=2, column=0)
@@ -154,7 +112,8 @@ class StartPage(tk.Frame):
 class ThreeServerWindow(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.label = tk.Label(self, text='Загруженность сети', font=LARGE_FONT)
+        self.label = tk.Label(self, text='Загруженность сети',
+                              font=LARGE_FONT)
         self.label.grid(sticky=tk.N, column=0, columnspan=3, pady=7)
 
         self.img = ImageTk.PhotoImage(Image.open("img/N3.jpg"))
@@ -196,9 +155,17 @@ class ThreeServerWindow(tk.Frame):
                                  command=lambda: controller.show_frame(StartPage))
         self.button2.grid(row=3, column=1, pady=7)
 
-        canvas = FigureCanvasTkAgg(fig, self)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+        self.fig = Figure()
+        self.ax1 = self.fig.add_subplot(311)
+        self.ax2 = self.fig.add_subplot(312)
+        self.ax3 = self.fig.add_subplot(313)
+
+        self.canvas = FigureCanvasTkAgg(self.fig, self)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+
+        # self.toolbar = NavigationToolbar2TkAgg(self.canvas, self)
+        # self.toolbar.update()
 
     def start(self):
         self.N = 3
@@ -211,6 +178,11 @@ class ThreeServerWindow(tk.Frame):
 
         LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
         LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
+
+        # ThreeServerWindow.build_graph(self, self.canvas)
+        ThreeServerWindow.test_graph(self, self.fig,
+                                     self.ax1, self.ax2, self.ax3,
+                                     self.canvas)
 
         try:
             pullData = open("buf.txt", "r").read()
@@ -228,11 +200,76 @@ class ThreeServerWindow(tk.Frame):
             self.data_forecast.grid(row=1, column=2, sticky=tk.W, padx=7)
             self.data_queue.grid(row=2, column=2, sticky=tk.W, padx=7)
             self.data_lost.grid(row=3, column=2, sticky=tk.W, padx=7)
-
-            # pullData.close()
         except IOError:
             print("An IOError has occurred!")
-            
+
+    def test_graph(self, fig, ax1, ax2, ax3, canvas):
+        xList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        yList = [5, 2, 7, 7, 8, 0, 6, 4, 3, 3]
+
+        ax1.plot(xList, yList, "black", label='CPU')
+
+        # self.canvas = FigureCanvasTkAgg(self.fig, self)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+
+    def build_graph(self, canvas):
+        try:
+            fig = Figure()
+
+            xList = [1,2,3,4,5,6,7,8,9,10]
+            yList = [5,2,7,7,8,0,6,4,3,3]
+
+            # ax1.clear()
+            ax1 = fig.add_subplot(311)
+            ax1.plot(xList, yList, "black", label='CPU')
+            ax1.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
+
+            title = "Сервер N1"
+            ax1.set_title(title)
+
+            file2 = open("N2.txt", "r").read()
+            ax2_list = file2.split('\n')
+            xList = []
+            yList = []
+
+            for eachLine in ax2_list:
+                if len(eachLine) > 1:
+                    x, y = eachLine.split(',')
+                    xList.append(int(x))
+                    yList.append(int(y))
+
+            # ax2.clear()
+            ax2 = fig.add_subplot(312)
+            ax2.plot(xList, yList, "black", label='CPU')
+            ax2.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
+
+            title = "Сервер N2"
+            ax2.set_title(title)
+
+            file3 = open("N3.txt", "r").read()
+            ax3_list = file3.split('\n')
+            xList = []
+            yList = []
+
+            for eachLine in ax3_list:
+                if len(eachLine) > 1:
+                    x, y = eachLine.split(',')
+                    xList.append(int(x))
+                    yList.append(int(y))
+
+            # ax3.clear()
+            ax3 = fig.add_subplot(313)
+            ax3.plot(xList, yList, "black", label='CPU')
+            ax3.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
+            title = "Сервер N3"
+            ax3.set_title(title)
+
+            canvas.draw()
+            canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+        except IOError:
+            print("An IOError has occurred!")
+
 
 class FourServerWindow(tk.Frame):
     def __init__(self, parent, controller):
@@ -254,9 +291,9 @@ class FourServerWindow(tk.Frame):
                                  command=lambda: controller.show_frame(StartPage))
         self.button2.grid(row=3, column=1, pady=7)
 
-        canvas = FigureCanvasTkAgg(fig, self)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+        # canvas = FigureCanvasTkAgg(fig, self)
+        # canvas.draw()
+        # canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
 
     def start(self):
         self.N = 4
@@ -292,9 +329,9 @@ class FiveServerWindow(tk.Frame):
                                  command=lambda: controller.show_frame(StartPage))
         self.button2.grid(row=4, column=1, pady=7)
 
-        canvas = FigureCanvasTkAgg(fig, self)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=2, rowspan=4)
+        # canvas = FigureCanvasTkAgg(fig, self)
+        # canvas.draw()
+        # canvas.get_tk_widget().grid(row=1, column=2, rowspan=4)
 
     def start(self):
         self.N = 5
@@ -310,13 +347,30 @@ class FiveServerWindow(tk.Frame):
         LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
         LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
 
-        # print()
 
+def check_files():
+    try:
+        file = codecs.open("buf.txt", "w", "utf-8")
+        file.close()
+        file = codecs.open("N1.txt", "w", "utf-8")
+        file.close()
+        file = codecs.open("N2.txt", "w", "utf-8")
+        file.close()
+        file = codecs.open("N3.txt", "w", "utf-8")
+        file.close()
+        file = codecs.open("N4.txt", "w", "utf-8")
+        file.close()
+        file = codecs.open("N5.txt", "w", "utf-8")
+        file.close()
+    except IOError:
+        print("An IOError has occurred!")
 
 def main():
+    check_files()
+
     app = LoadBalance()
     app.geometry("1000x500")
-    ani = animation.FuncAnimation(fig, animate, interval=10)
+    # ani = animation.FuncAnimation(fig, animate, interval=25)
     app.mainloop()
 
 
