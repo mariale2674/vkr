@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import matplotlib
+matplotlib.use('Qt4Agg')
 matplotlib.use("TkAgg")
-import matplotlib.animation as animation
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from matplotlib import style
@@ -13,7 +13,7 @@ from PIL import ImageTk, Image
 import numpy as np
 import load_balance as lb
 import codecs
-import random
+import time
 
 LARGE_FONT = ("Verdana, 12")
 NORMAL_FONT = ("TimesNewRoman, 10")
@@ -155,10 +155,18 @@ class ThreeServerWindow(tk.Frame):
                                  command=lambda: controller.show_frame(StartPage))
         self.button2.grid(row=3, column=1, pady=7)
 
+        # plt.ion()
         self.fig = Figure()
         self.ax1 = self.fig.add_subplot(311)
         self.ax2 = self.fig.add_subplot(312)
         self.ax3 = self.fig.add_subplot(313)
+
+        title1 = "Сервер N1"
+        title2 = "Сервер N2"
+        title3 = "Сервер N3"
+        self.ax1.set_title(title1)
+        self.ax2.set_title(title2)
+        self.ax3.set_title(title3)
 
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw()
@@ -170,8 +178,8 @@ class ThreeServerWindow(tk.Frame):
     def start(self):
         self.N = 3
         self.u = np.array([0] * self.N)
-        self.u_max = np.array([3000, 4000, 5000])
-        self.time = np.array([100, 200, 300])
+        self.u_max = np.array([4000, 5000, 3000])
+        self.time = np.array([200, 300, 200])
         self.X = np.array([[1, 0, 1, 0, 1],
                            [0, 1, 1, 0, 1],
                            [1, 0, 1, 1, 0]])
@@ -179,9 +187,7 @@ class ThreeServerWindow(tk.Frame):
         LB = lb.LoadBalance(self.u, self.u_max, self.X, self.time, self.N)
         LB.distribution(LB.u, LB.u_max, LB.X, LB.time, LB.N)
 
-        ThreeServerWindow.build_graph(self, self.fig,
-                                     self.ax1, self.ax2, self.ax3,
-                                     self.canvas)
+        ThreeServerWindow.build_graph(self, self.fig, self.ax1, self.ax2, self.ax3, self.canvas, self.u_max)
 
         try:
             pullData = open("buf.txt", "r").read()
@@ -202,73 +208,55 @@ class ThreeServerWindow(tk.Frame):
         except IOError:
             print("An IOError has occurred!")
 
-    def test_graph(self, fig, ax1, ax2, ax3, canvas):
-        xList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        yList = [5, 2, 7, 7, 8, 0, 6, 4, 3, 3]
-
-        ax1.plot(xList, yList, "black", label='CPU')
-
-        # self.canvas = FigureCanvasTkAgg(self.fig, self)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
-
-    def build_graph(self, fig, ax1, ax2, ax3, canvas):
+    def build_graph(self, fig, ax1, ax2, ax3, canvas, u_max):
         try:
-            file1 = open("N2.txt", "r").read()
-            ax1_list = file1.split('\n')
-            xList = []
-            yList = []
-
-            for eachLine in ax1_list:
-                if len(eachLine) > 1:
-                    x, y = eachLine.split(',')
-                    xList.append(int(x))
-                    yList.append(int(y))
-
-            ax1.plot(xList, yList, "black", label='CPU')
-            ax1.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
-
-            title = "Сервер N1"
-            ax1.set_title(title)
-
+            file1 = open("N1.txt", "r").read()
             file2 = open("N2.txt", "r").read()
-            ax2_list = file2.split('\n')
-            xList = []
-            yList = []
-
-            for eachLine in ax2_list:
-                if len(eachLine) > 1:
-                    x, y = eachLine.split(',')
-                    xList.append(int(x))
-                    yList.append(int(y))
-
-            ax2.plot(xList, yList, "black", label='CPU')
-            ax2.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
-
-            title = "Сервер N2"
-            ax2.set_title(title)
-
             file3 = open("N3.txt", "r").read()
+            ax1_list = file1.split('\n')
+            ax2_list = file2.split('\n')
             ax3_list = file3.split('\n')
-            xList = []
-            yList = []
+            xList1 = []
+            yList1 = []
+            xList2 = []
+            yList2 = []
+            xList3 = []
+            yList3 = []
 
-            for eachLine in ax3_list:
-                if len(eachLine) > 1:
-                    x, y = eachLine.split(',')
-                    xList.append(int(x))
-                    yList.append(int(y))
+            ThreeServerWindow.readline(self, ax1_list, xList1, yList1)
+            ThreeServerWindow.readline(self, ax2_list, xList2, yList2)
+            ThreeServerWindow.readline(self, ax3_list, xList3, yList3)
 
-            ax3.plot(xList, yList, "black", label='CPU')
-            ax3.legend(bbox_to_anchor=(0, 1.02, 1, .102), loc=3, ncol=2, borderaxespad=0)
-
-            title = "Сервер N3"
-            ax3.set_title(title)
+            ThreeServerWindow.draw_next_point(self, canvas, ax1, xList1, yList1, u_max)
+            # for i in range (len(xList1)):
+            #     ax1.plot(xList1[i], yList1[i], "black", label='CPU')
+            #     ax1.plot(u_max[0], "r--", label='max_CPU')
+            # ax1.legend(loc=u'upper center', mode='expand', borderaxespad=0, ncol=3)
+            ax2.plot(xList2, yList2, "black", label='CPU')
+            ax2.plot(u_max[1], "r--", label='max_CPU')
+            ax2.legend(loc=u'upper center', mode='expand', borderaxespad=0, ncol=3)
+            ax3.plot(xList3, yList3, "black", label='CPU')
+            ax3.plot(u_max[2], "r--", label='max_CPU')
+            ax3.legend(loc=u'upper center', mode='expand', borderaxespad=0, ncol=3)
 
             canvas.draw()
             canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+
         except IOError:
             print("An IOError has occurred!")
+
+    def readline(self, ax, xList, yList):
+        for eachLine in ax:
+            if len(eachLine) > 1:
+                x, y = eachLine.split(',')
+                xList.append(int(x))
+                yList.append(int(y))
+
+    def draw_next_point(self, canvas, ax, xList, yList, u_max):
+        line1, = ax.plot(xList, yList, "black", label='CPU')
+        for counter in range(len(xList)):
+            line1.set_ydata(yList[counter])
+            canvas.draw()
 
 
 class FourServerWindow(tk.Frame):
@@ -290,10 +278,6 @@ class FourServerWindow(tk.Frame):
         self.button2 = tk.Button(self, text='Назад',
                                  command=lambda: controller.show_frame(StartPage))
         self.button2.grid(row=3, column=1, pady=7)
-
-        # canvas = FigureCanvasTkAgg(fig, self)
-        # canvas.draw()
-        # canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
 
     def start(self):
         self.N = 4
@@ -328,10 +312,6 @@ class FiveServerWindow(tk.Frame):
         self.button2 = tk.Button(self, text='Назад',
                                  command=lambda: controller.show_frame(StartPage))
         self.button2.grid(row=4, column=1, pady=7)
-
-        # canvas = FigureCanvasTkAgg(fig, self)
-        # canvas.draw()
-        # canvas.get_tk_widget().grid(row=1, column=2, rowspan=4)
 
     def start(self):
         self.N = 5
@@ -369,8 +349,7 @@ def main():
     check_files()
 
     app = LoadBalance()
-    app.geometry("1000x500")
-    # ani = animation.FuncAnimation(fig, animate, interval=25)
+    # app.geometry("1000x500")
     app.mainloop()
 
 
