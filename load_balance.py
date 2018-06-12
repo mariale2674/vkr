@@ -138,19 +138,18 @@ class LoadBalance:
                 file.write("\n")
                 file.close()
 
-                if N == 4:
+                if (N == 4) or (N == 5):
                     file = codecs.open("txt/N4.txt", "a", "utf-8")
                     file.write(" %s" % k)
                     file.write(",%s" % u[3])
                     file.write("\n")
                     file.close()
-
-                if N == 5:
-                    file = codecs.open("txt/N5.txt", "a", "utf-8")
-                    file.write(" %s" % k)
-                    file.write(",%s" % u[4])
-                    file.write("\n")
-                    file.close()
+                    if N == 5:
+                        file = codecs.open("txt/N5.txt", "a", "utf-8")
+                        file.write(" %s" % k)
+                        file.write(",%s" % u[4])
+                        file.write("\n")
+                        file.close()
 
             except IOError:
                 print("An IOError has occurred!")
