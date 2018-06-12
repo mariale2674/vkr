@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import matplotlib
+import matplotlib.ticker
 matplotlib.use('Qt4Agg')
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -175,9 +176,14 @@ class ThreeServerWindow(tk.Frame):
         self.ax2 = self.fig.add_subplot(312)
         self.ax3 = self.fig.add_subplot(313)
 
+        formatter = matplotlib.ticker.NullFormatter()
+        self.ax1.xaxis.set_major_formatter(formatter)
+        self.ax2.xaxis.set_major_formatter(formatter)
+        self.ax3.xaxis.set_major_formatter(formatter)
+
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw()
-        self.canvas.get_tk_widget().grid(row=0, column=1, rowspan=5, sticky=tk.N+tk.E)
+        self.canvas.get_tk_widget().grid(row=0, column=1, rowspan=5,sticky=tk.N+tk.E)
 
     def start(self):
         self.N = 3
@@ -298,6 +304,12 @@ class FourServerWindow(tk.Frame):
         self.ax2 = self.fig.add_subplot(412)
         self.ax3 = self.fig.add_subplot(413)
         self.ax4 = self.fig.add_subplot(414)
+
+        formatter = matplotlib.ticker.NullFormatter()
+        self.ax1.xaxis.set_major_formatter(formatter)
+        self.ax2.xaxis.set_major_formatter(formatter)
+        self.ax3.xaxis.set_major_formatter(formatter)
+        self.ax4.xaxis.set_major_formatter(formatter)
 
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw()
@@ -427,6 +439,13 @@ class FiveServerWindow(tk.Frame):
         self.ax3 = self.fig.add_subplot(513)
         self.ax4 = self.fig.add_subplot(514)
         self.ax5 = self.fig.add_subplot(515)
+
+        formatter = matplotlib.ticker.NullFormatter()
+        self.ax1.xaxis.set_major_formatter(formatter)
+        self.ax2.xaxis.set_major_formatter(formatter)
+        self.ax3.xaxis.set_major_formatter(formatter)
+        self.ax4.xaxis.set_major_formatter(formatter)
+        self.ax5.xaxis.set_major_formatter(formatter)
 
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw()
