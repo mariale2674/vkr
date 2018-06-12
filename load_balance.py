@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import codecs
 import random
 import numpy as np
 np.set_printoptions(threshold=np.nan)
-import codecs
 
 M = 5
 
@@ -96,8 +96,6 @@ class LoadBalance:
                         q -= 1
                         q_types.remove(type)
 
-            forecast = u + past_u
-
             present_lam = LoadBalance.lam(self, requests, d)
             if k == 1:
                 past_lam = LoadBalance.lam(self, random.randint(100, 1000), d)
@@ -155,6 +153,7 @@ class LoadBalance:
 
             past_b = b
             past_request = requests
+            forecast = u + past_u
             past_u = u
             k += 1
 
