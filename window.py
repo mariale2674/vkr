@@ -94,7 +94,6 @@ class LoadBalance(tk.Tk):
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-
         self.label = tk.Label(self, text='Выберите количество серверов:', width=110, pady=40, font=LARGE_FONT)
         self.label.grid(row=0, column=0)
 
@@ -183,8 +182,8 @@ class ThreeServerWindow(tk.Frame):
     def start(self):
         self.N = 3
         self.u = np.array([0] * self.N)
-        self.u_max = np.array([4000, 5000, 3000])
-        self.time = np.array([200, 300, 200])
+        self.u_max = np.array([7000, 5000, 3000])
+        self.time = np.array([400, 350, 200])
         self.X = np.array([[1, 0, 0, 0, 1],
                            [0, 1, 1, 0, 1],
                            [1, 0, 1, 1, 0]])
@@ -195,7 +194,7 @@ class ThreeServerWindow(tk.Frame):
         ThreeServerWindow.build_graph(self, self.fig, self.ax1, self.ax2, self.ax3, self.canvas, self.u_max)
 
         try:
-            pullData = open("buf.txt", "r").read()
+            pullData = open("txt/buf.txt", "r").read()
             dataList = pullData.split('\n')
 
             self.data_u = tk.Label(self.info, text=dataList[0],
@@ -215,13 +214,13 @@ class ThreeServerWindow(tk.Frame):
 
     def build_graph(self, fig, ax1, ax2, ax3, canvas, u_max):
         try:
-            file = open("N1.txt", "r").read()
+            file = open("txt/N1.txt", "r").read()
             ThreeServerWindow.draw_graph(self, ax1, file)
             ax1.set_ylabel('N1', fontsize=12)
-            file = open("N2.txt", "r").read()
+            file = open("txt/N2.txt", "r").read()
             ThreeServerWindow.draw_graph(self, ax2, file)
             ax2.set_ylabel('N2', fontsize=12)
-            file = open("N3.txt", "r").read()
+            file = open("txt/N3.txt", "r").read()
             ThreeServerWindow.draw_graph(self, ax3, file)
             ax3.set_ylabel('N3', fontsize=12)
 
@@ -317,17 +316,17 @@ class FiveServerWindow(tk.Frame):
 
 def check_files():
     try:
-        file = codecs.open("buf.txt", "w", "utf-8")
+        file = codecs.open("txt/buf.txt", "w", "utf-8")
         file.close()
-        file = codecs.open("N1.txt", "w", "utf-8")
+        file = codecs.open("txt/N1.txt", "w", "utf-8")
         file.close()
-        file = codecs.open("N2.txt", "w", "utf-8")
+        file = codecs.open("txt/N2.txt", "w", "utf-8")
         file.close()
-        file = codecs.open("N3.txt", "w", "utf-8")
+        file = codecs.open("txt/N3.txt", "w", "utf-8")
         file.close()
-        file = codecs.open("N4.txt", "w", "utf-8")
+        file = codecs.open("txt/N4.txt", "w", "utf-8")
         file.close()
-        file = codecs.open("N5.txt", "w", "utf-8")
+        file = codecs.open("txt/N5.txt", "w", "utf-8")
         file.close()
     except IOError:
         print("An IOError has occurred!")
