@@ -78,6 +78,9 @@ class LoadBalance:
                     u[min_N] += 1
                     x[min_N, array_of_types] += 1
 
+            # var_forecast = np.array([0] * N)
+            var_forecast = u + (u - past_u)
+
             for i in range(N):
                 u[i] -= random.randint(0, time[i])
                 if u[i] < 0:
@@ -154,18 +157,16 @@ class LoadBalance:
             except IOError:
                 print("An IOError has occurred!")
 
-            var_forecast = np.array([0] * N)
-            sum_forecast = np.array([0] * N)
+            # var_forecast = np.array([0] * N)
+            # sum_forecast = np.array([0] * N)
 
-            for i in range(N):
-                for j in range(M):
-                    sum_forecast[i] += a[j] * x[i][j] * u[i]
+            # for i in range(N):
+            #     for j in range(M):
+            #         sum_forecast[i] += a[j] * x[i][j] * u[i]
 
-            # print(past_u, sum_forecast)
-            var_forecast = past_u + sum_forecast
             past_b = b
-            past_request = requests
             past_u = u
+            past_request = requests
             k += 1
 
         try:
