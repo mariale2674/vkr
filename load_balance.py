@@ -46,16 +46,19 @@ class LoadBalance:
         past_request = 0
         past_b = 0
         past_u = np.array([0] * N)
-        forecast = np.array([0] * N)
+        var_forecast = np.array([0] * N)
 
         while k < 100:
             g = 0
             arr = 0
             Arr = np.array([0] * n)
+            a = np.array([0] * M)
+            x = np.array([[0] * M] * N)
             requests = random.randint(100, 1000)
 
             for i in range(requests):
                 array_of_types = random.randint(0, 4)
+                a[array_of_types] += 1
                 buf = [row[array_of_types] for row in X]
                 min_N = np.argmax(buf)
                 min_u = u[min_N]
@@ -73,6 +76,7 @@ class LoadBalance:
                         lost += 1
                 else:
                     u[min_N] += 1
+                    x[min_N, array_of_types] += 1
 
             for i in range(N):
                 u[i] -= random.randint(0, time[i])
@@ -118,31 +122,31 @@ class LoadBalance:
             d = LoadBalance.dist(self, d, b, past_b)
 
             try:
-                file = codecs.open("N1.txt", "a", "utf-8")
+                file = codecs.open("txt/N1.txt", "a", "utf-8")
                 file.write("%s" % k)
                 file.write(",%s" % u[0])
                 file.write("\n")
                 file.close()
-                file = codecs.open("N2.txt", "a", "utf-8")
+                file = codecs.open("txt/N2.txt", "a", "utf-8")
                 file.write("%s" % k)
                 file.write(",%s" % u[1])
                 file.write("\n")
                 file.close()
-                file = codecs.open("N3.txt", "a", "utf-8")
+                file = codecs.open("txt/N3.txt", "a", "utf-8")
                 file.write("%s" % k)
                 file.write(",%s" % u[2])
                 file.write("\n")
                 file.close()
 
                 if N == 4:
-                    file = codecs.open("N4.txt", "a", "utf-8")
+                    file = codecs.open("txt/N4.txt", "a", "utf-8")
                     file.write(" %s" % k)
                     file.write(",%s" % u[3])
                     file.write("\n")
                     file.close()
 
                 if N == 5:
-                    file = codecs.open("N5.txt", "a", "utf-8")
+                    file = codecs.open("txt/N5.txt", "a", "utf-8")
                     file.write(" %s" % k)
                     file.write(",%s" % u[4])
                     file.write("\n")
@@ -151,21 +155,29 @@ class LoadBalance:
             except IOError:
                 print("An IOError has occurred!")
 
+            var_forecast = np.array([0] * N)
+            sum_forecast = np.array([0] * N)
+
+            for i in range(N):
+                for j in range(M):
+                    sum_forecast[i] += a[j] * x[i][j] * u[i]
+
+            # print(past_u, sum_forecast)
+            var_forecast = past_u + sum_forecast
             past_b = b
             past_request = requests
-            forecast = u + past_u
             past_u = u
             k += 1
 
         try:
-            file = codecs.open("buf.txt", "w", "utf-8")
+            file = codecs.open("txt/buf.txt", "w", "utf-8")
 
             for element in u:
                 file.write("%s " % element)
 
             file.write("\n")
 
-            for element in forecast:
+            for element in var_forecast:
                 file.write("%s " % element)
 
             file.write("\n%s" % q)
