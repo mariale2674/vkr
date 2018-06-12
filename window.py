@@ -4,7 +4,6 @@
 import matplotlib
 matplotlib.use('Qt4Agg')
 matplotlib.use("TkAgg")
-from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from matplotlib import style
@@ -13,13 +12,13 @@ from PIL import ImageTk, Image
 import numpy as np
 import load_balance as lb
 import codecs
-import time
 
 LARGE_FONT = ("Verdana, 12")
 NORMAL_FONT = ("TimesNewRoman, 10")
 SMALL_FONT = ("TimesNewRoman, 8")
 
 style.use("ggplot")
+matplotlib.rc('lines', linewidth=1)
 
 M = 5
 var_u = '0'
@@ -66,7 +65,10 @@ class LoadBalance(tk.Tk):
         helpmenu = tk.Menu(menu, tearoff=0)
         helpmenu.add_command(label='Помощь',
                              command = lambda: popupmsg('Никто вам не поможет.\n'))
-        helpmenu.add_command(label="О программе")
+        helpmenu.add_command(label="О программе",
+                             command=lambda: popupmsg('ВКР студентки группы ИКПИ-42\n'
+                                                      'Лебедевой Марии Сергеевны\n'
+                                                      '2018 г.'))
 
         menu.add_cascade(label="Файл", menu=filemenu)
         menu.add_cascade(label="Справка", menu=helpmenu)
@@ -93,32 +95,44 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        self.label = tk.Label(self, text='Выберите количество серверов:', width=50, height=5, font=LARGE_FONT)
-        self.label.grid(row=0, column=0, columnspan=3)
+        self.label = tk.Label(self, text='Выберите количество серверов:', width=110, pady=40, font=LARGE_FONT)
+        self.label.grid(row=0, column=0)
 
-        self.button1 = tk.Button(self, text='3 сервера',
+        self.buttons = tk.Frame(self)
+        self.buttons.grid(row=1, column=0)
+
+        self.img1 = ImageTk.PhotoImage(Image.open("img/N3.JPG"))
+        self.topology = tk.Label(self.buttons, image=self.img1)
+        self.topology.grid(row=0, column=0, sticky=tk.N, padx=7)
+        self.button1 = tk.Button(self.buttons, text='3 сервера',
                                   command=lambda: controller.show_frame(ThreeServerWindow))
-        self.button1.grid(row=2, column=0)
+        self.button1.grid(row=1, column=0, padx=10, pady=10)
 
-        self.button2 = tk.Button(self, text='4 сервера',
+        self.img2 = ImageTk.PhotoImage(Image.open("img/N4.JPG"))
+        self.topology = tk.Label(self.buttons, image=self.img2)
+        self.topology.grid(row=0, column=1, sticky=tk.N, padx=7)
+        self.button2 = tk.Button(self.buttons, text='4 сервера',
                                  command=lambda: controller.show_frame(FourServerWindow))
-        self.button2.grid(row=2, column=1)
+        self.button2.grid(row=1, column=1, padx=10, pady=10)
 
-        self.button3 = tk.Button(self, text='5 серверов',
+        self.img3 = ImageTk.PhotoImage(Image.open("img/N5.JPG"))
+        self.topology = tk.Label(self.buttons, image=self.img3)
+        self.topology.grid(row=0, column=2, sticky=tk.N, padx=7)
+        self.button3 = tk.Button(self.buttons, text='5 серверов',
                                  command=lambda: controller.show_frame(FiveServerWindow))
-        self.button3.grid(row=2, column=2)
+        self.button3.grid(row=1, column=2, padx=10, pady=10)
 
 
 class ThreeServerWindow(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.label = tk.Label(self, text='Загруженность сети',
-                              font=LARGE_FONT)
-        self.label.grid(sticky=tk.N, column=0, columnspan=3, pady=7)
-
-        self.img = ImageTk.PhotoImage(Image.open("img/N3.jpg"))
+        self.img = ImageTk.PhotoImage(Image.open("img/N3.JPG"))
         self.topology = tk.Label(self, image=self.img)
-        self.topology.grid(row=1, column=0, columnspan=2, padx=7)
+        self.topology.grid(row=0, column=0, sticky=tk.N, padx=7)
+
+        self.label = tk.Label(self, text='Количество серверов: 3',
+                              font=LARGE_FONT)
+        self.label.grid(row=1, column=0)
 
         self.info = tk.Frame(self)
         self.info.grid(row=2, column=0)
@@ -148,39 +162,30 @@ class ThreeServerWindow(tk.Frame):
         self.data_queue.grid(row=2, column=2, sticky=tk.W, padx=7)
         self.data_lost.grid(row=3, column=2, sticky=tk.W, padx=7)
 
-        self.button1 = tk.Button(self, text='Старт',
+        self.buttons = tk.Frame(self)
+        self.buttons.grid(row=3, column=0)
+        self.button1 = tk.Button(self.buttons, text='Старт',
                                  command=lambda: ThreeServerWindow.start(self))
-        self.button1.grid(row=3, column=0, pady=7)
-        self.button2 = tk.Button(self, text='Назад',
+        self.button1.grid(row=0, column=0, pady=7)
+        self.button2 = tk.Button(self.buttons, text='Назад',
                                  command=lambda: controller.show_frame(StartPage))
-        self.button2.grid(row=3, column=1, pady=7)
+        self.button2.grid(row=0, column=1, pady=7)
 
-        # plt.ion()
         self.fig = Figure()
         self.ax1 = self.fig.add_subplot(311)
         self.ax2 = self.fig.add_subplot(312)
         self.ax3 = self.fig.add_subplot(313)
 
-        title1 = "Сервер N1"
-        title2 = "Сервер N2"
-        title3 = "Сервер N3"
-        self.ax1.set_title(title1)
-        self.ax2.set_title(title2)
-        self.ax3.set_title(title3)
-
         self.canvas = FigureCanvasTkAgg(self.fig, self)
         self.canvas.draw()
-        self.canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
-
-        # self.toolbar = NavigationToolbar2TkAgg(self.canvas, self)
-        # self.toolbar.update()
+        self.canvas.get_tk_widget().grid(row=0, column=1, rowspan=5, sticky=tk.N+tk.E)
 
     def start(self):
         self.N = 3
         self.u = np.array([0] * self.N)
         self.u_max = np.array([4000, 5000, 3000])
         self.time = np.array([200, 300, 200])
-        self.X = np.array([[1, 0, 1, 0, 1],
+        self.X = np.array([[1, 0, 0, 0, 1],
                            [0, 1, 1, 0, 1],
                            [1, 0, 1, 1, 0]])
 
@@ -210,53 +215,35 @@ class ThreeServerWindow(tk.Frame):
 
     def build_graph(self, fig, ax1, ax2, ax3, canvas, u_max):
         try:
-            file1 = open("N1.txt", "r").read()
-            file2 = open("N2.txt", "r").read()
-            file3 = open("N3.txt", "r").read()
-            ax1_list = file1.split('\n')
-            ax2_list = file2.split('\n')
-            ax3_list = file3.split('\n')
-            xList1 = []
-            yList1 = []
-            xList2 = []
-            yList2 = []
-            xList3 = []
-            yList3 = []
-
-            ThreeServerWindow.readline(self, ax1_list, xList1, yList1)
-            ThreeServerWindow.readline(self, ax2_list, xList2, yList2)
-            ThreeServerWindow.readline(self, ax3_list, xList3, yList3)
-
-            ThreeServerWindow.draw_next_point(self, canvas, ax1, xList1, yList1, u_max)
-            # for i in range (len(xList1)):
-            #     ax1.plot(xList1[i], yList1[i], "black", label='CPU')
-            #     ax1.plot(u_max[0], "r--", label='max_CPU')
-            # ax1.legend(loc=u'upper center', mode='expand', borderaxespad=0, ncol=3)
-            ax2.plot(xList2, yList2, "black", label='CPU')
-            ax2.plot(u_max[1], "r--", label='max_CPU')
-            ax2.legend(loc=u'upper center', mode='expand', borderaxespad=0, ncol=3)
-            ax3.plot(xList3, yList3, "black", label='CPU')
-            ax3.plot(u_max[2], "r--", label='max_CPU')
-            ax3.legend(loc=u'upper center', mode='expand', borderaxespad=0, ncol=3)
+            file = open("N1.txt", "r").read()
+            ThreeServerWindow.draw_graph(self, ax1, file)
+            ax1.set_ylabel('N1', fontsize=12)
+            file = open("N2.txt", "r").read()
+            ThreeServerWindow.draw_graph(self, ax2, file)
+            ax2.set_ylabel('N2', fontsize=12)
+            file = open("N3.txt", "r").read()
+            ThreeServerWindow.draw_graph(self, ax3, file)
+            ax3.set_ylabel('N3', fontsize=12)
 
             canvas.draw()
-            canvas.get_tk_widget().grid(row=1, column=2, rowspan=3)
+            canvas.get_tk_widget().grid(row=0, column=1, rowspan=5, sticky=tk.N+tk.E)
 
         except IOError:
             print("An IOError has occurred!")
 
-    def readline(self, ax, xList, yList):
-        for eachLine in ax:
+    def draw_graph(self, ax, file):
+        xList = []
+        yList = []
+
+        ax_list = file.split('\n')
+
+        for eachLine in ax_list:
             if len(eachLine) > 1:
                 x, y = eachLine.split(',')
                 xList.append(int(x))
                 yList.append(int(y))
 
-    def draw_next_point(self, canvas, ax, xList, yList, u_max):
-        line1, = ax.plot(xList, yList, "black", label='CPU')
-        for counter in range(len(xList)):
-            line1.set_ydata(yList[counter])
-            canvas.draw()
+        ax.plot(xList, yList)
 
 
 class FourServerWindow(tk.Frame):
