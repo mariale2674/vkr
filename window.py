@@ -65,7 +65,7 @@ class LoadBalance(tk.Tk):
 
         helpmenu = tk.Menu(menu, tearoff=0)
         helpmenu.add_command(label='Помощь',
-                             command = lambda: popupmsg('Никто вам не поможет.\n'))
+                             command = lambda: popupmsg('Раздел в разработке.\n'))
         helpmenu.add_command(label="О программе",
                              command=lambda: popupmsg('ВКР студентки группы ИКПИ-42\n'
                                                       'Лебедевой Марии Сергеевны\n'
