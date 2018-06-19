@@ -5,7 +5,7 @@ import matplotlib
 import matplotlib.ticker
 matplotlib.use('Qt4Agg')
 matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from matplotlib import style
 import tkinter as tk
