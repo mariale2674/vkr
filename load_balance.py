@@ -48,7 +48,7 @@ class LoadBalance:
         past_u = np.array([0] * N)
         var_forecast = np.array([0] * N)
 
-        while k < 100:
+        while k < 1000:
             g = 0
             arr = 0
             Arr = np.array([0] * n)
