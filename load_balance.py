@@ -37,6 +37,7 @@ class LoadBalance:
 
     def distribution(self, u, u_max, X, time, N):
         k = 1
+        max_k = 100
         d = 300
         n = 3
         q = 0
@@ -48,7 +49,7 @@ class LoadBalance:
         past_u = np.array([0] * N)
         var_forecast = np.array([0] * N)
 
-        while k < 1000:
+        while k < max_k:
             g = 0
             arr = 0
             Arr = np.array([0] * n)
