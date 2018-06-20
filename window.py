@@ -34,16 +34,72 @@ def popupmsg(msg):
     def leavemini():
         popup.destroy()
 
-    popup.wm_title('!')
+    popup.wm_title('Справка')
 
     label = tk.Label(popup, text=msg)
     label.pack()
 
-    b1 = tk.Button(popup, text="Ok", width=10, command = leavemini)
+    b1 = tk.Button(popup, text="Ok", width=10, command=leavemini)
     b1.pack()
 
     popup.mainloop()
 
+def configuration():
+    popup = tk.Tk()
+
+    def leavemini():
+        popup.destroy()
+        return get_k, get_N1, get_N2, get_N3, get_N4, get_N5
+
+    popup.wm_title('Конфигурация сети')
+
+    container = tk.Frame(popup)
+    container.pack(side="top", fill="both", expand=True)
+    container.grid_rowconfigure(0, weight=1)
+    container.grid_columnconfigure(0, weight=1)
+
+    u_max = tk.Label(container, text='Вместимость серверов')
+    u_max.grid(row=0, column=0, sticky=tk.W)
+    servers = tk.Frame(container)
+    N1 = tk.Entry(servers)
+    N1.delete(0, tk.END)
+    N1.insert(0, "7000")
+    N2 = tk.Entry(servers)
+    N2.delete(0, tk.END)
+    N2.insert(0, "5000")
+    N3 = tk.Entry(servers)
+    N3.delete(0, tk.END)
+    N3.insert(0, "3000")
+    N4 = tk.Entry(servers)
+    N4.delete(0, tk.END)
+    N4.insert(0, "0")
+    N5 = tk.Entry(servers)
+    N5.delete(0, tk.END)
+    N5.insert(0, "0")
+    get_N1 = int(N1.get())
+    get_N2 = int(N2.get())
+    get_N3 = int(N3.get())
+    get_N4 = int(N4.get())
+    get_N5 = int(N5.get())
+    N1.grid(row=0, column=0, padx=10, pady=10)
+    N2.grid(row=0, column=1, padx=10, pady=10)
+    N3.grid(row=0, column=2, padx=10, pady=10)
+    N4.grid(row=0, column=3, padx=10, pady=10)
+    N5.grid(row=0, column=4, padx=10, pady=10)
+    servers.grid(row=0, column=1)
+
+    step = tk.Label(container, text='Количество шагов')
+    step.grid(row=1, column=0, sticky=tk.W)
+    k = tk.Entry(container)
+    k.delete(0, tk.END)
+    k.insert(0, "100")
+    get_k = int(k.get())
+    k.grid(row=1, column=1, padx=10, pady=10, sticky=tk.W)
+
+    b1 = tk.Button(container, text="Принять", width=10, command=leavemini)
+    b1.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+
+    popup.mainloop()
 
 class LoadBalance(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -52,26 +108,29 @@ class LoadBalance(tk.Tk):
         tk.Tk.wm_title(self, 'Система мониторинга загруженности серверов')
 
         container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand = True)
+        container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
-        # scrollbar = tk.Scrollbar(self)
-        # scrollbar.pack(side = tk.RIGHT, fill = Y)
-
         menu = tk.Menu(container)
         filemenu = tk.Menu(menu, tearoff=0)
-        filemenu.add_command(label="Выход", command=lambda: container.quit())
+        filemenu.add_command(label="Выход",
+                             command=lambda: container.quit())
+
+        configmenu = tk.Menu(menu, tearoff=0)
+        configmenu.add_command(label="Конфигурация",
+                               command=lambda: configuration())
 
         helpmenu = tk.Menu(menu, tearoff=0)
         helpmenu.add_command(label='Помощь',
-                             command = lambda: popupmsg('Раздел в разработке.\n'))
+                             command=lambda: popupmsg('Раздел в разработке.\n'))
         helpmenu.add_command(label="О программе",
                              command=lambda: popupmsg('ВКР студентки группы ИКПИ-42\n'
                                                       'Лебедевой Марии Сергеевны\n'
                                                       '2018 г.'))
 
         menu.add_cascade(label="Файл", menu=filemenu)
+        menu.add_cascade(label="Настройки", menu=configmenu)
         menu.add_cascade(label="Справка", menu=helpmenu)
 
         tk.Tk.config(self, menu=menu)
